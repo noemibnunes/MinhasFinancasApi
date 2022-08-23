@@ -5,6 +5,7 @@ import java.util.Optional;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import udemyexercicio.minhasFinancias.exception.AutenticacaoException;
@@ -19,19 +20,25 @@ public class UsuarioService implements IUsuarioService {
 	@Autowired
 	private UsuarioRepository repository;
 	
-	public UsuarioService(UsuarioRepository repository) {
+	private PasswordEncoder encoder;
+	
+	public UsuarioService(UsuarioRepository repository, PasswordEncoder encoder) {
 		this.repository = repository;
+		this.encoder = encoder;
 	}
 	
 	@Override
 	public Usuario autenticarUsuario(String email, String senha) {
+		
 		Optional<Usuario> usuario = repository.findByEmail(email); 
 		
 		if(!usuario.isPresent()) {
 			throw new AutenticacaoException("Usuário não encontrado para o email informado!");
 		}
 		
-		if(!usuario.get().getSenha().equals(senha)){
+		boolean senhasIguais = encoder.matches(senha, usuario.get().getSenha());
+		
+		if(!senhasIguais){
 			throw new AutenticacaoException("Senha Inválida!");
 		}
 		
@@ -42,7 +49,14 @@ public class UsuarioService implements IUsuarioService {
 	@Transactional
 	public Usuario cadastrarUsuario(Usuario usuario) {
 		validarEmail(usuario.getEmail());
+		criptografarSenha(usuario);
 		return repository.save(usuario);
+	}
+
+	private void criptografarSenha(Usuario usuario) { //alt+shift+m - cria um metodo
+		String senha = usuario.getSenha();
+		String senhaCripto = encoder.encode(senha);
+		usuario.setSenha(senhaCripto);
 	}
 
 	@Override

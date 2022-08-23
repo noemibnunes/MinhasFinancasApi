@@ -1,4 +1,4 @@
-package udemyexercicio.minhasFinancias.controller;
+package udemyexercicio.minhasFinancias.api.controller;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
-import udemyexercicio.minhasFinancias.dto.AtualizarStatusDTO;
-import udemyexercicio.minhasFinancias.dto.LancamentoDTO;
+import udemyexercicio.minhasFinancias.api.dto.AtualizarStatusDTO;
+import udemyexercicio.minhasFinancias.api.dto.LancamentoDTO;
 import udemyexercicio.minhasFinancias.exception.RegraNegocioException;
 import udemyexercicio.minhasFinancias.model.entity.Lancamentos;
 import udemyexercicio.minhasFinancias.model.entity.Usuario;

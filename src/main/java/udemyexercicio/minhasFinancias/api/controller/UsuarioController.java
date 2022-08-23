@@ -1,4 +1,4 @@
-package udemyexercicio.minhasFinancias.controller;
+package udemyexercicio.minhasFinancias.api.controller;
 
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -13,10 +13,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
-import udemyexercicio.minhasFinancias.dto.UsuarioDTO;
+import udemyexercicio.minhasFinancias.api.dto.TokenDTO;
+import udemyexercicio.minhasFinancias.api.dto.UsuarioDTO;
 import udemyexercicio.minhasFinancias.exception.AutenticacaoException;
 import udemyexercicio.minhasFinancias.exception.RegraNegocioException;
 import udemyexercicio.minhasFinancias.model.entity.Usuario;
+import udemyexercicio.minhasFinancias.service.implementacao.JwtService;
 import udemyexercicio.minhasFinancias.service.implementacao.LancamentoService;
 import udemyexercicio.minhasFinancias.service.implementacao.UsuarioService;
 
@@ -27,6 +29,7 @@ public class UsuarioController {
 	
 	private final UsuarioService service;
 	private final LancamentoService lancamentoService;
+	private final JwtService jwtService;
 	
 	@PostMapping("/salvar")
 	public ResponseEntity salvar(@RequestBody UsuarioDTO dto) {
@@ -41,10 +44,13 @@ public class UsuarioController {
 	}
 	
 	@PostMapping("/autenticar")
-	public ResponseEntity autenticar(@RequestBody UsuarioDTO dto) {
+	public ResponseEntity<?> autenticar(@RequestBody UsuarioDTO dto) {
 		try {
 			Usuario userAutenticado = service.autenticarUsuario(dto.getEmail(), dto.getSenha());
-			return ResponseEntity.ok(userAutenticado);
+			String token = jwtService.gerarToken(userAutenticado);
+			TokenDTO tokenDTO = new TokenDTO(userAutenticado.getNome(), token);
+			
+			return ResponseEntity.ok(tokenDTO);
 		}catch (AutenticacaoException e) {
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}

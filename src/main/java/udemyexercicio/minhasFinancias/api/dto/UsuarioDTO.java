@@ -1,4 +1,4 @@
-package udemyexercicio.minhasFinancias.dto;
+package udemyexercicio.minhasFinancias.api.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
